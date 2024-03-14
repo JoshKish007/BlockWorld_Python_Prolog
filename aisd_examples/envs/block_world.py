@@ -35,6 +35,7 @@ class BlockWorldEnv(gym.Env):
         # Set up dictionary to convert action numbers into Prolog actions
         self.actions_dict = {}
         actions_result = self.prolog_thread.query("action(A)")
+        # Actions are extracted from prolog: functor have move action and Args have blocks and position state. The below code puts the data into format move(a,b,4)
         for i, A in enumerate(actions_result):
             action_string = A['A']['functor']
             first = True
@@ -65,10 +66,12 @@ class BlockWorldEnv(gym.Env):
 
     # Helper function to get observations
     def _get_obs(self):
+        # observation of agent location and target location
         return {"agent": self._agent_location, "target": self._target_location}
     
     # Helper function to get additional information
     def _get_info(self):
+        # this code provides the difference of agent and target
         return {
             "distance": abs(
                 self._agent_location - self._target_location
@@ -81,7 +84,6 @@ class BlockWorldEnv(gym.Env):
         if self.display is not None:
             # Randomly choose an initial state
             state_integer = np.random.randint(0, len(self.states_dict), size=1, dtype=int)
-            self.state = state_integer
             state_value = list(self.states_dict.keys())[list(self.states_dict.values()).index(state_integer)]
             
             # Extract target and agent values from the state
@@ -91,11 +93,7 @@ class BlockWorldEnv(gym.Env):
             # Set agent location and display target
             self._agent_location = state_integer
             self.display.target = target_value
-                       
-            # Store initial state values
-            self.start_value = state_value
-            self.target_value = target_value
-            self.agent_value = agent_value
+
 
         # Issue Prolog query to reset
         self.prolog_thread.query("reset")
