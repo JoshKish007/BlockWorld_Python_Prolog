@@ -13,10 +13,10 @@ num_states = len(env.states_dict)
 qtable = np.random.rand(num_states, env.action_space.n).tolist()
 
 # Hyperparameters
-episodes = 6
-gamma = 0.3
-epsilon = 0.07
-decay = 0.1
+episodes = 20
+gamma = 0.1
+epsilon = 0.06
+decay = 0.2
 
 # Lists to store episode returns and steps per episode
 episode_returns = []
@@ -71,16 +71,17 @@ for i in range(episodes):
 plt.figure(figsize=(10, 5))
 plt.subplot(2, 1, 1)
 plt.plot(range(1, episodes + 1), episode_returns)
-plt.title('Episode Returns')
+plt.title('Episode Returns Hyperparameter set 8')
 plt.xlabel('Episode')
 plt.ylabel('Return')
 
 plt.subplot(2, 1, 2)
 plt.plot(range(1, episodes + 1), steps_per_episode)
-plt.title('Steps per Episode')
+plt.title('Steps per Episode Hyperparameter set 8')
 plt.xlabel('Episode')
 plt.ylabel('Steps')
 
 plt.tight_layout()
+plt.savefig('episode_returns_and_steps.png')
 
 env.close()

@@ -88,10 +88,8 @@ class BlockWorldEnv(gym.Env):
             
             # Extract target and agent values from the state
             target_value = state_value[-3:]
-            agent_value = state_value[0:3]
             
-            # Set agent location and display target
-            self._agent_location = state_integer
+            # Set display target
             self.display.target = target_value
 
 
@@ -104,8 +102,11 @@ class BlockWorldEnv(gym.Env):
         agent_state_value = state_value[0:3]
         
         # Update agent and target locations based on Prolog state
-        self._agent_location = list(self.states_dict.values())[list(self.states_dict.keys()).index(agent_state_value)]
-        self._target_location = list(self.states_dict.values())[list(self.states_dict.keys()).index(target_value)]
+        #self._agent_location = list(self.states_dict.values())[list(self.states_dict.keys()).index(agent_state_value)]
+        #self._target_location = list(self.states_dict.values())[list(self.states_dict.keys()).index(target_value)]
+        
+        self._agent_location = list(self.states_dict.values())[list(self.states_dict.keys()).index(agent_state_value+target_value)]
+        self._target_location = list(self.states_dict.values())[list(self.states_dict.keys()).index(target_value+target_value)]
         
         observation = self._get_obs()
         info = self._get_info()
@@ -130,14 +131,16 @@ class BlockWorldEnv(gym.Env):
         if result:
             # If the action is successful, update the agent state and provide a negative reward
             current_state = self.prolog_thread.query("current_state(State)")
-            self.agent_value = current_state[0]['State']
+            agent_value = current_state[0]['State']
             reward = -1
             
-            if self.agent_value == self.display.target:
+            if agent_value == self.display.target:
                 # If the agent reaches the target state, provide a positive reward and terminate the episode
                 reward = 100
                 terminated = True
-                
+            # Update the agent location based on the Prolog state
+            #self._agent_location = list(self.states_dict.values())[list(self.states_dict.keys()).index(agent_value)]
+            self._agent_location = list(self.states_dict.values())[list(self.states_dict.keys()).index(agent_value+self.display.target)]
         else:
             # If the action fails, provide a negative reward
             reward = -10
@@ -145,8 +148,6 @@ class BlockWorldEnv(gym.Env):
         if self.render_mode == "human":
             self.render()
             
-        # Update the agent location based on the Prolog state
-        self._agent_location = list(self.states_dict.values())[list(self.states_dict.keys()).index(self.agent_value)]
 
         observations = self._get_obs()
         return observations, reward, terminated, False, {}
@@ -154,7 +155,7 @@ class BlockWorldEnv(gym.Env):
     # Render the environment
     def render(self):
         if self.render_mode == "human":
-            self.display.step(self.agent_value)
+            self.display.step(list(self.states_dict.keys())[list(self.states_dict.values()).index(self._agent_location)])
 
     # Close the environment
     def close(self):

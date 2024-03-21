@@ -15,7 +15,7 @@ reset:-
    
 % Compute all possible states of the blocks world
 % state(State) means that State is a valid configuration of blocks
-state(State):-
+state_helper(State):-
    (block(A);place(A)),dif(A,a),
    (block(B);place(B)),dif(B,b),
    (block(C);place(C)),dif(C,c),
@@ -24,6 +24,11 @@ state(State):-
    dif(A,C),
    grounded(A,B,C),
    atomics_to_string([A,B,C],State).
+   
+state(State):-
+  state_helper(Agent),   % three digit state
+  state_helper(Target),  % another three digit state
+  atomics_to_string([Agent,Target],State).    % together, they make a six digit state
 
 % grounded(A,B,C) means that a configuration of blocks is valid,
 % where Block a is on A, Block b is on B, and Block c is on C.
