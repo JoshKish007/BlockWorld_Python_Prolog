@@ -83,7 +83,7 @@ class BlockWorldEnv(gym.Env):
         super().reset(seed=seed)
         if self.display is not None:
             # Randomly choose an initial state
-            state_integer = np.random.randint(0, len(self.states_dict), size=1, dtype=int)
+            state_integer = 6
             state_value = list(self.states_dict.keys())[list(self.states_dict.values()).index(state_integer)]
             
             # Extract target and agent values from the state
@@ -101,10 +101,11 @@ class BlockWorldEnv(gym.Env):
         # Issue Prolog query to retrieve current state
         result = self.prolog_thread.query("current_state(State)")
         agent_state = result[0]['State']
+        agent_state_value = state_value[0:3]
         
         # Update agent and target locations based on Prolog state
-        self._agent_location = list(self.states_dict.values())[list(self.states_dict.keys()).index(agent_state)]
-        self._target_location = self._agent_location
+        self._agent_location = list(self.states_dict.values())[list(self.states_dict.keys()).index(agent_state_value)]
+        self._target_location = list(self.states_dict.values())[list(self.states_dict.keys()).index(target_value)]
         
         observation = self._get_obs()
         info = self._get_info()
